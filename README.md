@@ -1,6 +1,9 @@
 # HanaLoop: 탄소 배출량 대시보드 과제
 안녕하세요, HanaLoop 프론트엔드 개발자 과제에 참여한 **이성일**입니다. 본 프로젝트는 Next.js, TypeScript, Tailwind CSS를 기반으로, 과제 명세서에 제시된 탄소 배출량 데이터를 시각화하는 단일 페이지 웹 애플리케이션입니다.
 
+![하나루프 메인](https://github.com/user-attachments/assets/7e2edc71-b026-4a76-9dff-59fae99e8d03)
+
+
 ## ✨ 주요 기능
 
 - 기업 목록 조회
