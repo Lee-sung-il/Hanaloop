@@ -3,6 +3,10 @@
 
 ![하나루프 메인](https://github.com/user-attachments/assets/7e2edc71-b026-4a76-9dff-59fae99e8d03)
 
+![하나루프 회사 추가](https://github.com/user-attachments/assets/91fc1ac2-10b8-424c-b953-3be441089c09)
+
+![하나루프 다크모드](https://github.com/user-attachments/assets/6a213d33-ccdb-4a97-9f6f-4bb88b52f2d9)
+
 
 ## ✨ 주요 기능
 
