@@ -3,8 +3,8 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import ReactQueryProvider from "./providers";
 import React from "react";
-import {ThemeProvider} from "@/app/ThemeProvider";
-
+import { ThemeProvider } from "@/app/ThemeProvider";
+import { Toaster } from "react-hot-toast";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -19,17 +19,18 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        // 2. <html> 태그에 suppressHydrationWarning를 추가합니다.
         <html lang="en" suppressHydrationWarning>
         <body className={inter.className}>
-        {/* 3. ThemeProvider로 전체를 감싸줍니다. */}
         <ThemeProvider
             attribute="class"
             defaultTheme="system"
             enableSystem
             disableTransitionOnChange
         >
-            <ReactQueryProvider>{children}</ReactQueryProvider>
+            <ReactQueryProvider>
+                {children}
+                <Toaster position="top-center" />
+            </ReactQueryProvider>
         </ThemeProvider>
         </body>
         </html>

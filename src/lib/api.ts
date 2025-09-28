@@ -1,21 +1,40 @@
-import { companies, posts } from "@/data/seed";
-import { Company, Post } from "./types";
+import { companies as seedCompanies, posts as seedPosts } from "@/data/seed";
+import { Company, GhgEmission, Post } from "./types";
+import { isWithinInterval, parseISO } from 'date-fns'; // 👈 1. date-fns에서 날짜 비교 함수 import
 
-// 데이터 복사본을 만들어 원본 데이터가 변경되지 않도록 함
-const _companies = [...companies];
-let _posts = [...posts];
+let _companies: Company[] = JSON.parse(JSON.stringify(seedCompanies));
+let _posts: Post[] = JSON.parse(JSON.stringify(seedPosts));
 
-// 200ms ~ 800ms 사이의 임의의 딜레이를 생성
 const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
 const jitter = () => 200 + Math.random() * 600;
-// 15% 확률로 에러 발생
 const maybeFail = () => Math.random() < 0.15;
 
-export async function fetchCompanies(): Promise<Company[]> {
+export async function fetchCompanies(
+    country?: string,
+    startDate?: string,
+    endDate?: string
+): Promise<Company[]> {
     await delay(jitter());
-    // 실제 API 호출을 시뮬레이션
-    return JSON.parse(JSON.stringify(_companies));
+
+    let filteredCompanies = [..._companies];
+
+    if (country && country !== 'all') {
+        filteredCompanies = filteredCompanies.filter(c => c.country === country);
+    }
+
+    if (startDate && endDate) {
+        const range = { start: parseISO(startDate), end: parseISO(endDate) };
+        filteredCompanies = filteredCompanies.map(company => ({
+            ...company,
+            emissions: company.emissions.filter(e => {
+                const emissionDate = parseISO(e.yearMonth);
+                return isWithinInterval(emissionDate, range);
+            }),
+        }));
+    }
+    return JSON.parse(JSON.stringify(filteredCompanies));
 }
+
 
 export async function fetchPosts(companyId?: string): Promise<Post[]> {
     await delay(jitter());
@@ -33,12 +52,10 @@ export async function createOrUpdatePost(
     if (maybeFail()) throw new Error("Save failed. Please try again.");
 
     if (p.id) {
-        // 기존 포스트 업데이트
         _posts = _posts.map((x) => (x.id === p.id ? (p as Post) : x));
         return p as Post;
     }
 
-    // 새 포스트 생성
     const created = { ...p, id: crypto.randomUUID() };
     _posts = [..._posts, created];
     return created;
@@ -47,6 +64,42 @@ export async function createOrUpdatePost(
 export async function fetchCompanyById(id: string): Promise<Company | undefined> {
     await delay(jitter());
     const company = _companies.find((c) => c.id === id);
-    // 실제 API 호출처럼 깊은 복사를 해서 반환
     return company ? JSON.parse(JSON.stringify(company)) : undefined;
+}
+
+export async function addEmissionToCompany(
+    companyId: string,
+    newEmission: Omit<GhgEmission, 'id'>
+): Promise<Company> {
+    await delay(jitter());
+    if (maybeFail()) throw new Error("데이터 저장에 실패했습니다.");
+
+    let updatedCompany: Company | undefined;
+    _companies = _companies.map(company => {
+        if (company.id === companyId) {
+            const updatedEmissions = [...company.emissions, newEmission];
+            updatedCompany = { ...company, emissions: updatedEmissions };
+            return updatedCompany;
+        }
+        return company;
+    });
+
+    if (!updatedCompany) {
+        throw new Error("회사를 찾을 수 없습니다.");
+    }
+    return updatedCompany;
+}
+
+
+export async function addCompany(newCompanyData: Omit<Company, 'id' | 'emissions'>): Promise<Company> {
+    await delay(jitter());
+    if (maybeFail()) throw new Error("회사 추가에 실패했습니다.");
+
+    const newCompany: Company = {
+        ...newCompanyData,
+        id: `c${_companies.length + 1}`,
+        emissions: [],
+    };
+    _companies = [..._companies, newCompany];
+    return newCompany;
 }
