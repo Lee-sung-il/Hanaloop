@@ -23,7 +23,6 @@ export default function CompanyDetailPage() {
                 <Button onClick={() => setIsModalOpen(true)}>+ 배출량 추가</Button>
             </div>
 
-            {/* 👇 2. 여기에 차트를 보여주는 새로운 카드를 추가합니다. */}
             <Card className="mb-6">
                 <CardHeader>
                     <CardTitle>Emissions Trend</CardTitle>
@@ -34,7 +33,6 @@ export default function CompanyDetailPage() {
                 </CardContent>
             </Card>
 
-            {/* 기존 배출량 목록 카드 */}
             <Card>
                 <CardHeader>
                     <CardTitle>월별 배출량 데이터</CardTitle>
@@ -42,6 +40,7 @@ export default function CompanyDetailPage() {
                         {company.name}의 월별 탄소 배출량 데이터입니다.
                     </CardDescription>
                 </CardHeader>
+
                 <CardContent>
                     <ul>
                         {company.emissions.map((emission) => (

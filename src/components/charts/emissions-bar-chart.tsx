@@ -9,7 +9,6 @@ interface EmissionsBarChartProps {
 
 export default function EmissionsBarChart({data}: EmissionsBarChartProps) {
     const chartData = data.map(item => ({
-        // '2024-01-01' -> 'Jan' 형식으로 변경
         month: new Date(item.yearMonth).toLocaleString('en-US', {month: 'short'}),
         emissions: item.emissions,
     }));

@@ -16,10 +16,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { AddCompanyModal } from "@/components/add-company-modal";
 import TimeSeriesChart from "@/components/charts/time-series-chart";
 
-// 연도 선택을 위한 상수
 const availableYears = [new Date().getFullYear(), new Date().getFullYear() - 1, new Date().getFullYear() - 2];
 
-// 월-연도 선택기 컴포넌트
 function MonthYearSelector({ date, setDate }: { date: Date, setDate: (date: Date) => void }) {
     const handleYearChange = (year: string) => {
         setDate(new Date(Number(year), date.getMonth(), 1));
@@ -54,21 +52,32 @@ function MonthYearSelector({ date, setDate }: { date: Date, setDate: (date: Date
 }
 
 export default function DashboardPage() {
-    // 1. 필터 상태 관리 (시작일, 종료일, 국가)
     const [startDate, setStartDate] = useState<Date>(new Date(2024, 0, 1));
     const [endDate, setEndDate] = useState<Date>(new Date(2024, 2, 1));
     const [selectedCountry, setSelectedCountry] = useState<string>('all');
     
     const [isAddCompanyModalOpen, setIsAddCompanyModalOpen] = useState(false);
 
-    // 날짜 범위가 변경되면 dateRange를 업데이트
+    const handleSetStartDate = (date: Date) => {
+        if (date > endDate) {
+            setEndDate(date);
+        }
+        setStartDate(date);
+    };
+
+    const handleSetEndDate = (date: Date) => {
+        if (date < startDate) {
+            setStartDate(date);
+        }
+        setEndDate(date);
+    };
+
     const dateRange = useMemo(() => ({ from: startDate, to: endDate }), [startDate, endDate]);
 
     // 2. 필터 상태를 훅에 전달하여 데이터 가져오기
     const { data: allCompanies, isLoading: isLoadingAllCompanies } = useCompanies('all');
     const { data: companies, isLoading, isError, error } = useCompanies(selectedCountry, dateRange);
 
-    // 3. 데이터 계산 로직 (이하 동일)
     const uniqueCountries = useMemo(() => {
         if (!allCompanies) return [];
         return ['all', ...Array.from(new Set(allCompanies.map(c => c.country).sort()))];
@@ -111,13 +120,12 @@ export default function DashboardPage() {
         return <div className="p-6 text-red-500">Error loading data: {error.message}</div>;
     }
 
-    // 필터 컨트롤 UI (재사용을 위해 컴포넌트로 분리)
     const FilterControls = () => (
         <div className="flex flex-col sm:flex-row sm:items-center gap-4">
             <div className="flex flex-col sm:flex-row sm:items-center gap-2">
-                <MonthYearSelector date={startDate} setDate={setStartDate} />
+                <MonthYearSelector date={startDate} setDate={handleSetStartDate} />
                 <span className="self-center">~</span>
-                <MonthYearSelector date={endDate} setDate={setEndDate} />
+                <MonthYearSelector date={endDate} setDate={handleSetEndDate} />
             </div>
             <Select value={selectedCountry} onValueChange={setSelectedCountry} disabled={isLoadingAllCompanies}>
                 <SelectTrigger className="w-full sm:w-[180px]">
@@ -142,7 +150,6 @@ export default function DashboardPage() {
         <>
             <AddCompanyModal isOpen={isAddCompanyModalOpen} onOpenChange={setIsAddCompanyModalOpen} />
             <div className="p-4 sm:p-6 lg:p-8 space-y-6">
-                {/* 헤더 및 필터 */}
                 <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4">
                     <h1 className="text-2xl font-bold text-slate-800 dark:text-slate-200">Dashboard</h1>
                     
@@ -166,7 +173,6 @@ export default function DashboardPage() {
                     </div>
                 </div>
                 
-                {/* 요약 카드 */}
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
                     <Card>
                         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -200,7 +206,6 @@ export default function DashboardPage() {
                     </Card>
                 </div>
 
-                {/* 차트 및 회사 목록 */}
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <Card className="lg:col-span-2">
                         <CardHeader><CardTitle>Monthly Emissions Trend</CardTitle></CardHeader>

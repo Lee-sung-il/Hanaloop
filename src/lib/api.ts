@@ -1,6 +1,6 @@
 import { companies as seedCompanies, posts as seedPosts } from "@/data/seed";
 import { Company, GhgEmission, Post } from "./types";
-import { isWithinInterval, parseISO } from 'date-fns'; // 👈 1. date-fns에서 날짜 비교 함수 import
+import { isWithinInterval, parseISO } from 'date-fns';
 
 let _companies: Company[] = JSON.parse(JSON.stringify(seedCompanies));
 let _posts: Post[] = JSON.parse(JSON.stringify(seedPosts));
